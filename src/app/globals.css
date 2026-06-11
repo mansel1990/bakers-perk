@@ -5,28 +5,35 @@
    repaints. Espresso is live; alternates kept below for reference.
    ============================================================ */
 :root {
-  --ink: #171010;        /* dark surfaces (panel, custom band, footer) */
-  --ink-2: #211715;      /* dark cards / inputs */
-  --cream: #f7f0e6;      /* light page background */
-  --paper: #fdf9f2;      /* light cards */
-  --accent: #c98a4b;     /* brand accent (caramel) */
-  --on-ink: #f4e7d7;     /* text on dark surfaces */
-  --muted: #9a8270;      /* muted text on light */
-  --line: #e2d5c2;       /* borders on light */
-  --dark-muted: #8f7b6e; /* muted text on dark */
-  --dark-line: #3a2c28;  /* borders on dark */
+  --ink: #2c4032;        /* dark surfaces (mobile header, custom band, footer) */
+  --ink-2: #38503f;      /* dark cards / inputs */
+  --panel: #41604c;      /* desktop sidebar — lighter forest */
+  --panel-line: #557460; /* borders on panel */
+  --panel-muted: #b3c6ac;/* muted text on panel */
+  --cream: #edf2e1;      /* light page background — sage ivory */
+  --paper: #f8faf1;      /* light cards */
+  --accent: #c97a90;     /* brand accent — rose */
+  --on-ink: #eef3e4;     /* text on dark surfaces */
+  --text: #26352b;       /* body text on light */
+  --muted: #7e8b76;      /* muted text on light */
+  --line: #d5dec6;       /* borders on light */
+  --dark-muted: #9fb298; /* muted text on dark */
+  --dark-line: #445848;  /* borders on dark */
   --wa: #25d366;         /* WhatsApp green */
 }
 
 /* Alternate palettes (paste over :root values to switch):
-   Plum      — ink #1C1119  ink-2 #271723  cream #F8F0F2  paper #FDF8FA  accent #E08FA9  on-ink #F6E9EE  muted #9C8490  line #EAD8DE  dark-muted #9B7E8C  dark-line #382336
-   Forest    — ink #10160F  ink-2 #1A2117  cream #F2F1E8  paper #FBFAF3  accent #A8C686  on-ink #F2EFE4  muted #8B927E  line #DFE0CE  dark-muted #7E8B72  dark-line #28301F
-   Tangerine — ink #121212  ink-2 #1C1A17  cream #F5F1EA  paper #FCFAF5  accent #FF6B35  on-ink #F5F1EA  muted #8C8579  line #E4DDD1  dark-muted #8C8579  dark-line #2A2722
+   Porcelain Blue — ink #1B2A3A  ink-2 #25374A  panel #2E4458  cream #E9EEF2  paper #F7FAFC  accent #7FA3C2  on-ink #E9EFF5  text #1F2B36  muted #7A8896  line #D3DCE3  dark-muted #8CA0B4  dark-line #31465C
+   Champagne Noir — ink #1B1A17  ink-2 #262420  panel #2B2A25  cream #F3EFE5  paper #FAF7EF  accent #BFA86E  on-ink #EFEADB  text #26241F  muted #8E887A  line #E0D9C8  dark-muted #8F8A7B  dark-line #33312D
+   Espresso       — ink #171010  ink-2 #211715  panel #261A16  cream #F2E9DC  paper #FBF6EE  accent #C98A4B  on-ink #F4E7D7  text #2A211C  muted #9A8270  line #E0D2BE  dark-muted #8F7B6E  dark-line #3A2C28
 */
 
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
+  --color-panel: var(--panel);
+  --color-panel-line: var(--panel-line);
+  --color-panel-muted: var(--panel-muted);
   --color-cream: var(--cream);
   --color-paper: var(--paper);
   --color-accent: var(--accent);
@@ -46,7 +53,7 @@ html {
 
 body {
   background: var(--cream);
-  color: var(--ink);
+  color: var(--text);
   font-family: var(--font-grotesk), sans-serif;
   -webkit-tap-highlight-color: transparent;
 }

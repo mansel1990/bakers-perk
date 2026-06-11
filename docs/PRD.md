@@ -138,7 +138,7 @@ Modern editorial concept, approved via prototype (`lookbook.html`):
 - **Typography:** Fraunces (serif, display + italic accents) + Space Grotesk (UI). Oversized editorial headings; tagline de-emphasized.
 - **Menu index:** numbered editorial rows; desktop hover shows a cursor-following photo card; mobile shows inline thumbnails. Live search above the index (matches names, categories, tags like "eggless") with custom-cake nudge on empty results.
 - **Custom cakes:** prompt-style "Describe your dream cake…" input that opens pre-filled WhatsApp.
-- **Palette:** Espresso (live) — ink #171010, cream #F7F0E6, accent caramel #C98A4B. All colors are CSS variables in one block in `src/app/globals.css`; alternates (Plum, Forest, Tangerine) documented inline. Final palette is a 10-line swap.
+- **Palette:** Pistachio Rose (live) — forest ink #2C4032, sidebar panel #41604C (lighter), sage cream #EDF2E1, rose accent #C97A90. All colors are CSS variables in one block in `src/app/globals.css`; alternates (Plum, Forest, Tangerine) documented inline. Final palette is a 10-line swap.
 - **Motion:** scroll reveals (IntersectionObserver), hover transitions; GSAP/Lenis smooth scroll added in polish phase. Mobile-first, Lighthouse-friendly — no WebGL.
 - Gallery and Menu are separate routes carrying the same look and feel.
 

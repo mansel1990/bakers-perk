@@ -28,10 +28,10 @@ export default function Aside() {
   return (
     <>
       {/* Desktop pinned panel — 30% */}
-      <aside className="fixed inset-y-0 left-0 z-10 hidden w-[30vw] flex-col bg-ink p-9 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-10 hidden w-[30vw] flex-col bg-panel p-9 lg:flex">
         <div>
           <Logo className="text-[21px]" />
-          <div className="mt-1.5 text-[9px] uppercase tracking-[3px] text-dark-muted">
+          <div className="mt-1.5 text-[9px] uppercase tracking-[3px] text-panel-muted">
             {SITE.byline} — Chennai
           </div>
         </div>
@@ -41,7 +41,7 @@ export default function Aside() {
               key={l.href}
               href={l.href}
               className={`block py-2.5 text-xs uppercase tracking-[2px] transition-all hover:pl-2.5 hover:text-on-ink ${
-                path.startsWith(l.href) ? "text-on-ink" : "text-dark-muted"
+                path.startsWith(l.href) ? "text-on-ink" : "text-panel-muted"
               }`}
             >
               <span className="mr-3 text-[10px] text-accent">{l.n}</span>
@@ -49,8 +49,8 @@ export default function Aside() {
             </Link>
           ))}
         </nav>
-        <div className="text-[11px] leading-relaxed text-dark-muted">
-          <div className="mb-3 font-serif text-[12.5px] italic text-accent">{SITE.tagline}</div>
+        <div className="text-[11px] leading-relaxed text-panel-muted">
+          <div className="mb-3 font-serif text-[12.5px] italic text-on-ink/90">{SITE.tagline}</div>
           Pudupet, Chennai 600002
           <br />
           {SITE.hours}
@@ -61,7 +61,7 @@ export default function Aside() {
             href={waLink("Hi Baker's Perk!")}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-2 rounded-full bg-on-ink px-5 py-2.5 text-xs font-medium text-ink transition-transform hover:-translate-y-0.5"
+            className="mt-3 inline-flex items-center gap-2 rounded-full border border-panel-line px-5 py-2.5 text-[10px] font-medium uppercase tracking-[2.5px] text-on-ink transition-colors hover:bg-on-ink hover:text-ink"
           >
             Order on WhatsApp ↗
           </a>
