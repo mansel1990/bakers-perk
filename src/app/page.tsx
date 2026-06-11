@@ -10,7 +10,7 @@ export default function Home() {
           className="absolute inset-0 bg-ink-2 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url(/images/hero.jpg), radial-gradient(circle at 60% 35%, #6e3b2a, #1a0d08 75%)",
+              "url(/images/hero.jpg), radial-gradient(circle at 60% 35%, #4a6b54, #22392b 75%)",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent" />
