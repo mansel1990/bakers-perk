@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN TOKENS — change the palette here and the whole site
+   repaints. Espresso is live; alternates kept below for reference.
+   ============================================================ */
+:root {
+  --ink: #171010;        /* dark surfaces (panel, custom band, footer) */
+  --ink-2: #211715;      /* dark cards / inputs */
+  --cream: #f7f0e6;      /* light page background */
+  --paper: #fdf9f2;      /* light cards */
+  --accent: #c98a4b;     /* brand accent (caramel) */
+  --on-ink: #f4e7d7;     /* text on dark surfaces */
+  --muted: #9a8270;      /* muted text on light */
+  --line: #e2d5c2;       /* borders on light */
+  --dark-muted: #8f7b6e; /* muted text on dark */
+  --dark-line: #3a2c28;  /* borders on dark */
+  --wa: #25d366;         /* WhatsApp green */
+}
+
+/* Alternate palettes (paste over :root values to switch):
+   Plum      — ink #1C1119  ink-2 #271723  cream #F8F0F2  paper #FDF8FA  accent #E08FA9  on-ink #F6E9EE  muted #9C8490  line #EAD8DE  dark-muted #9B7E8C  dark-line #382336
+   Forest    — ink #10160F  ink-2 #1A2117  cream #F2F1E8  paper #FBFAF3  accent #A8C686  on-ink #F2EFE4  muted #8B927E  line #DFE0CE  dark-muted #7E8B72  dark-line #28301F
+   Tangerine — ink #121212  ink-2 #1C1A17  cream #F5F1EA  paper #FCFAF5  accent #FF6B35  on-ink #F5F1EA  muted #8C8579  line #E4DDD1  dark-muted #8C8579  dark-line #2A2722
+*/
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-accent: var(--accent);
+  --color-on-ink: var(--on-ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-dark-muted: var(--dark-muted);
+  --color-dark-line: var(--dark-line);
+  --color-wa: var(--wa);
+  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-grotesk);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-grotesk), sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal.on {
+  opacity: 1;
+  transform: none;
+}
