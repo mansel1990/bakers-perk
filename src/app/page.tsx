@@ -13,8 +13,8 @@ export default function Home() {
               "url(/images/hero.jpg), radial-gradient(circle at 60% 35%, #6e3b2a, #1a0d08 75%)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
-        <div className="absolute bottom-6 left-5 right-5 lg:bottom-9 lg:left-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent" />
+        <div className="absolute bottom-6 left-5 right-5 lg:bottom-9 lg:left-10 [text-shadow:0_1px_18px_rgba(20,28,22,0.45)]">
           <div className="text-[10px] uppercase tracking-[3px] text-accent">
             The 2026 collection
           </div>
