@@ -4,13 +4,12 @@ import DreamPrompt from "@/components/DreamPrompt";
 export default function Home() {
   return (
     <>
-      {/* Hero — drop hero.jpg into /public/images to replace the placeholder */}
+      {/* Hero — drop hero.jpg into /public/images, then add url(/images/hero.jpg) below */}
       <section className="relative h-[58svh] overflow-hidden lg:h-[84svh]">
         <div
           className="absolute inset-0 bg-ink-2 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(/images/hero.jpg), radial-gradient(circle at 60% 35%, #4a6b54, #22392b 75%)",
+            backgroundImage: "radial-gradient(circle at 60% 35%, #4a6b54, #22392b 75%)",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent" />

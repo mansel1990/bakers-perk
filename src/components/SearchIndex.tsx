@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MENU } from "@/data/menu";
+import { FEATURED_MENU, FULL_MENU } from "@/data/menu";
 
 export default function SearchIndex() {
   const [q, setQ] = useState("");
   const v = q.trim().toLowerCase();
-  const hits = MENU.filter(
+  const pool = v ? FULL_MENU : FEATURED_MENU;
+  const hits = pool.filter(
     (m) => !v || `${m.name} ${m.category} ${m.tags}`.toLowerCase().includes(v)
   );
 
@@ -45,10 +46,12 @@ export default function SearchIndex() {
             <span className="hidden w-6 text-[11px] text-accent lg:block">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <span
-              className="block h-12 w-[60px] flex-none rounded-[10px] bg-ink-2 bg-cover bg-center lg:hidden"
-              style={{ backgroundImage: `url(${m.image})` }}
-            />
+            {m.image && (
+              <span
+                className="block h-12 w-[60px] flex-none rounded-[10px] bg-ink-2 bg-cover bg-center lg:hidden"
+                style={{ backgroundImage: `url(${m.image})` }}
+              />
+            )}
             <span className="min-w-0">
               <span className="font-serif text-lg font-semibold group-hover:italic lg:text-[26px]">
                 {m.name}

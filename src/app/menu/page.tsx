@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { MENU } from "@/data/menu";
+import { FULL_MENU } from "@/data/menu";
 
 export const metadata: Metadata = { title: "Menu — Baker's Perk" };
 
@@ -13,7 +13,7 @@ export default function MenuPage() {
         the next build phase. The bakes below are the current rate card.
       </p>
       <div className="mt-8">
-        {MENU.map((m) => (
+        {FULL_MENU.map((m) => (
           <div key={m.slug} id={m.slug} className="flex items-baseline justify-between border-b border-line py-4">
             <span>
               <span className="font-serif text-xl font-semibold">{m.name}</span>
