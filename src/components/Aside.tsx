@@ -112,7 +112,7 @@ export default function Aside({ settings }: { settings: SiteSettings }) {
         <div className="text-[11px] leading-loose text-dark-muted">
           <span className="font-serif italic text-accent">{settings.tagline}</span>
           <br />
-          Pudupet, Chennai · 11 AM – 7 PM · @bakers_perk
+          Pudupet, Chennai · {settings.hours} · @bakers_perk
         </div>
       </div>
     </>

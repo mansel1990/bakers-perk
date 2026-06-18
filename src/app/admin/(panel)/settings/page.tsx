@@ -12,16 +12,27 @@ function Field({
   name,
   defaultValue,
   type = "text",
+  placeholder,
+  hint,
 }: {
   label: string;
   name: string;
   defaultValue?: string | number;
   type?: string;
+  placeholder?: string;
+  hint?: string;
 }) {
   return (
     <label className="block">
       <span className="text-xs text-muted">{label}</span>
-      <input name={name} type={type} defaultValue={defaultValue} className={INPUT} />
+      <input
+        name={name}
+        type={type}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        className={INPUT}
+      />
+      {hint ? <p className="mt-1.5 text-[11px] leading-relaxed text-muted">{hint}</p> : null}
     </label>
   );
 }
@@ -52,7 +63,13 @@ export default async function AdminSettingsPage() {
             <Field label="WhatsApp number (e.g. 919566074342)" name="whatsapp_number" defaultValue={s.whatsapp} />
             <Field label="Contact email" name="contact_email" defaultValue={s.email} />
             <Field label="Instagram URL" name="instagram" defaultValue={s.instagram} />
-            <Field label="Hours" name="hours" defaultValue={s.hours} />
+            <Field
+              label="Hours"
+              name="hours"
+              defaultValue={s.hours}
+              placeholder="Mon–Sat · 11 AM – 7 PM · Closed Sundays"
+              hint="Shown in the sidebar, footer, contact page, and menu PDF. Include closed days here — e.g. Closed Sundays."
+            />
           </div>
           <div className="mt-4">
             <Field label="Address" name="address" defaultValue={s.address} />

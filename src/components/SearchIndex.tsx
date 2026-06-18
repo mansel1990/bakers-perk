@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { MenuItemView } from "@/lib/data";
+import MenuPrice from "@/components/MenuPrice";
 
 export default function SearchIndex({
   featured,
@@ -64,8 +65,8 @@ export default function SearchIndex({
                 {m.category}
               </span>
             </span>
-            <span className="ml-auto flex-none text-right text-[11px] text-muted lg:text-xs">
-              {m.price}
+            <span className="ml-auto flex-none text-right">
+              <MenuPrice pricing={m.pricing} compact />
             </span>
             <span className="hidden text-accent opacity-0 transition-all group-hover:opacity-100 lg:block">
               →

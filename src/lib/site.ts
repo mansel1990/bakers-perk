@@ -10,7 +10,7 @@ export const SITE = {
   instagram: "https://www.instagram.com/bakers_perk",
   email: "alexjamez255@gmail.com",
   address: "13/5 Munusamy Lane, Adithanar Salai, Pudupet, Chennai 600002",
-  hours: "Open daily · 11 AM – 7 PM",
+  hours: "Mon–Sat · 11 AM – 7 PM · Closed Sundays",
   deliveryNote: "Delivering anywhere in Chennai",
   minLeadDays: 2,
 };

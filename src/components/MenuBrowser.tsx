@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import type { MenuGroup, MenuItemView } from "@/lib/data";
+import MenuPrice from "@/components/MenuPrice";
 
 function PriceRow({ m }: { m: MenuItemView }) {
   return (
     <div
       id={m.slug}
-      className="flex scroll-mt-[120px] items-baseline justify-between gap-4 border-b border-line py-4 last:border-0"
+      className="flex scroll-mt-[120px] items-center justify-between gap-4 border-b border-line py-4 last:border-0"
     >
       <span className="min-w-0">
         <span className="font-serif text-lg font-semibold lg:text-xl">{m.name}</span>
@@ -18,7 +19,9 @@ function PriceRow({ m }: { m: MenuItemView }) {
           </span>
         )}
       </span>
-      <span className="flex-none text-right text-xs text-muted">{m.price}</span>
+      <div className="flex-none text-right">
+        <MenuPrice pricing={m.pricing} />
+      </div>
     </div>
   );
 }

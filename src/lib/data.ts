@@ -65,11 +65,20 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
 /* Menu                                                                        */
 /* -------------------------------------------------------------------------- */
 
+export type PriceVariant = { label: string; priceInr: number };
+
+export type MenuPricing =
+  | { kind: "on-request" }
+  | { kind: "single"; priceInr: number }
+  | { kind: "variants"; variants: PriceVariant[] };
+
 export type MenuItemView = {
   slug: string;
   name: string;
   category: string;
+  /** Plain-text price for PDF export and search snippets */
   price: string;
+  pricing: MenuPricing;
   image: string | null;
   isEggless: boolean;
   searchText: string;
@@ -84,14 +93,29 @@ export type CategoryView = {
 
 export type MenuGroup = { category: CategoryView; items: MenuItemView[] };
 
-function formatPrice(
+function sortVariants(variants: { label: string; priceInr: number; sort: number }[]) {
+  return [...variants].sort((a, b) => a.sort - b.sort);
+}
+
+function buildPricing(
   variants: { label: string; priceInr: number; sort: number }[],
   isPriceOnRequest: boolean
-): string {
-  if (isPriceOnRequest || variants.length === 0) return "Enquire for price";
-  const sorted = [...variants].sort((a, b) => a.sort - b.sort);
-  if (sorted.length === 1 && sorted[0].label === "each") return INR(sorted[0].priceInr);
-  return sorted.map((v) => `${v.label} ${INR(v.priceInr)}`).join(" — ");
+): MenuPricing {
+  if (isPriceOnRequest || variants.length === 0) return { kind: "on-request" };
+  const sorted = sortVariants(variants);
+  if (sorted.length === 1 && sorted[0].label === "each") {
+    return { kind: "single", priceInr: sorted[0].priceInr };
+  }
+  return {
+    kind: "variants",
+    variants: sorted.map((v) => ({ label: v.label, priceInr: v.priceInr })),
+  };
+}
+
+function formatPrice(pricing: MenuPricing): string {
+  if (pricing.kind === "on-request") return "Enquire for price";
+  if (pricing.kind === "single") return INR(pricing.priceInr);
+  return pricing.variants.map((v) => `${v.label} ${INR(v.priceInr)}`).join(" — ");
 }
 
 /** All visible categories with their visible items (sorted), shaped for the UI. */
@@ -115,11 +139,13 @@ export const getMenuByCategory = cache(async (): Promise<MenuGroup[]> => {
         .filter((i) => i.categoryId === c.id)
         .map((i): MenuItemView => {
           const vs = variantsByItem.get(i.id) ?? [];
+          const pricing = buildPricing(vs, i.isPriceOnRequest);
           return {
             slug: i.slug,
             name: i.name,
             category: c.name,
-            price: formatPrice(vs, i.isPriceOnRequest),
+            price: formatPrice(pricing),
+            pricing,
             image: i.imageUrl,
             isEggless: i.isEggless,
             searchText: `${i.name} ${c.name} ${i.tags ?? ""} ${i.isEggless ? "eggless" : ""}`.toLowerCase(),
