@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FEATURED_MENU, FULL_MENU } from "@/data/menu";
+import type { MenuItemView } from "@/lib/data";
 
-export default function SearchIndex() {
+export default function SearchIndex({
+  featured,
+  all,
+}: {
+  featured: MenuItemView[];
+  all: MenuItemView[];
+}) {
   const [q, setQ] = useState("");
   const v = q.trim().toLowerCase();
-  const pool = v ? FULL_MENU : FEATURED_MENU;
-  const hits = pool.filter(
-    (m) => !v || `${m.name} ${m.category} ${m.tags}`.toLowerCase().includes(v)
-  );
+  const pool = v ? all : featured;
+  const hits = pool.filter((m) => !v || m.searchText.includes(v));
 
   return (
     <>

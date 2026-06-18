@@ -89,6 +89,39 @@ export const FULL_MENU: MenuItem[] = [
   item("Apple Pie", "Tarts & Pies", INR(80), "apple pie tart"),
 ];
 
+/**
+ * Category metadata for the /menu page — drives the section banners and the
+ * sticky jump-nav. `image` is an optional hook: drop a real product/mood photo
+ * path here later and the banner upgrades from a typographic gradient to a photo
+ * automatically. Order here is the order categories render in.
+ */
+export type MenuCategory = {
+  name: string;
+  id: string;
+  blurb: string;
+  image?: string;
+};
+
+export const MENU_CATEGORIES: MenuCategory[] = [
+  { name: "Standard Cakes", id: "standard-cakes", blurb: "Everyday classics, baked fresh — vanilla, black forest, chocolate and more.", image: "/images/menu-standard.jpg" },
+  { name: "Premium Cakes", id: "premium-cakes", blurb: "A richer league — Belgian chocolate, Ferrero, pistachio and red velvet.", image: "/images/menu-premium.jpg" },
+  { name: "Exotic Cakes", id: "exotic-cakes", blurb: "Baked cheesecakes and seasonal fruit specials, made to enquiry.", image: "/images/menu-exotic.jpg" },
+  { name: "Tiramisu & Mousse", id: "tiramisu-mousse", blurb: "Spoonable indulgence — tiramisu tubs, mousse and praline dreams.", image: "/images/menu-tiramisu.jpg" },
+  { name: "Doughnuts", id: "doughnuts", blurb: "Soft, filled and glazed — the daily counter favourites.", image: "/images/menu-doughnuts.jpg" },
+  { name: "Tarts & Pies", id: "tarts-pies", blurb: "Buttery shells with lemon, chocolate and spiced apple.", image: "/images/menu-tarts.jpg" },
+];
+
+/** Items grouped by category, in MENU_CATEGORIES order — for the menu page. */
+export function getMenuByCategory(): { category: MenuCategory; items: MenuItem[] }[] {
+  return MENU_CATEGORIES.map((category) => ({
+    category,
+    items: FULL_MENU.filter((m) => m.category === category.name),
+  })).filter((g) => g.items.length > 0);
+}
+
+/** True when a menu item is flagged eggless via its tags. */
+export const isEggless = (m: MenuItem) => /\beggless\b/.test(m.tags);
+
 /** Home-page index — curated highlights; full rate card is on /menu */
 const FEATURED_SLUGS = [
   "black-forest",

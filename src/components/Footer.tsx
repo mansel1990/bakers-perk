@@ -1,19 +1,20 @@
 import Link from "next/link";
-import { SITE, waLink } from "@/lib/site";
+import { waLink } from "@/lib/site";
+import type { SiteSettings } from "@/lib/data";
 
-export default function Footer() {
+export default function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer id="contact" className="border-t border-dark-line bg-ink px-5 pb-24 pt-12 lg:px-10 lg:pb-8">
       <div className="grid gap-7 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <div className="font-serif text-2xl font-semibold text-on-ink">
-            {SITE.name}
+            {settings.name}
             <span className="text-accent">.</span>
           </div>
-          <div className="mt-2.5 font-serif text-[13px] italic text-accent">{SITE.tagline}</div>
+          <div className="mt-2.5 font-serif text-[13px] italic text-accent">{settings.tagline}</div>
           <div className="mt-4 flex gap-2.5">
             <a
-              href={SITE.instagram}
+              href={settings.instagram}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -22,7 +23,7 @@ export default function Footer() {
               IG
             </a>
             <a
-              href={waLink("Hi Baker's Perk!")}
+              href={waLink("Hi Baker's Perk!", settings.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="WhatsApp"
@@ -47,15 +48,15 @@ export default function Footer() {
         </div>
         <div className="text-[13px] leading-relaxed text-dark-muted">
           <div className="mb-3 text-[10px] uppercase tracking-[3px] text-on-ink">Visit us</div>
-          {SITE.address}
+          {settings.address}
           <br />
-          {SITE.hours}
+          {settings.hours}
           <br />
-          {SITE.deliveryNote}
+          {settings.deliveryNote}
         </div>
       </div>
       <div className="mt-8 flex flex-wrap justify-between gap-2 border-t border-dark-line pt-4 text-[10px] uppercase tracking-[2px] text-dark-muted">
-        <span>© 2026 {SITE.name} {SITE.byline}</span>
+        <span>© 2026 {settings.name} {settings.byline}</span>
         <span>Made fresh in Chennai</span>
       </div>
     </footer>

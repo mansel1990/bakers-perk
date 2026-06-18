@@ -16,15 +16,26 @@ including a dedicated `--panel` token for the desktop sidebar. Paste a new set o
 values there and the entire site repaints — alternate palettes (Plum, Forest,
 Tangerine) are kept as a reference comment in the same file.
 
-## Shop info
+## Database (Neon Postgres + Drizzle)
 
-WhatsApp number, address, hours, tagline: `src/lib/site.ts` (moves to the admin
-backoffice in a later phase).
+All content lives in the `bakers_perk` schema. The public site reads it via
+`src/lib/data.ts`. Schema is in `src/db/schema.ts`.
 
-## Menu data
+```bash
+npm run db:push      # apply schema changes to the database
+npm run db:seed      # import src/data/* into the DB + upload photos to Vercel Blob
+npm run db:studio    # browse the database in Drizzle Studio
+```
 
-`src/data/menu.ts` (moves to Postgres + admin CRUD in a later phase).
+Env vars (see `.env.example`): `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`,
+`AUTH_SECRET`, `NEXT_PUBLIC_GA_ID`.
+
+## Shop info & menu
+
+Editable in the DB (`settings` and `menu_items` tables); admin UI is in progress.
+The static files in `src/data/*` and `src/lib/site.ts` are now only the **seed
+source** + fallback defaults.
 
 ## Roadmap
 
-See `docs/PRD.md`.
+See `docs/PRD.md`, `docs/PHASE2-PRD.md`, and `docs/IMPLEMENTATION.md`.

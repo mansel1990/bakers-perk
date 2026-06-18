@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import Aside from "@/components/Aside";
-import Footer from "@/components/Footer";
-import { SITE, waLink } from "@/lib/site";
+import Analytics from "@/components/Analytics";
+import RegisterSW from "@/components/RegisterSW";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -17,30 +16,52 @@ const grotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Baker's Perk — Handcrafted cakes in Chennai",
+  metadataBase: new URL("https://bakersperk.com"),
+  title: {
+    default: "Baker's Perk — Handcrafted cakes in Chennai",
+    template: "%s · Baker's Perk",
+  },
   description:
     "Handcrafted cakes, cheesecakes and bakes by Chef Alex. Made to order, delivered anywhere in Chennai. Order on WhatsApp.",
+  applicationName: "Baker's Perk",
+  appleWebApp: { capable: true, title: "Baker's Perk", statusBarStyle: "default" },
+  keywords: [
+    "Baker's Perk",
+    "cakes Chennai",
+    "custom cakes Chennai",
+    "eggless cakes",
+    "photo cakes",
+    "birthday cakes Chennai",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Baker's Perk",
+    title: "Baker's Perk — Handcrafted cakes in Chennai",
+    description:
+      "Handcrafted cakes, cheesecakes and bakes by Chef Alex. Made to order, delivered anywhere in Chennai.",
+    url: "https://bakersperk.com",
+    locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Baker's Perk — Handcrafted cakes in Chennai",
+    description: "Handcrafted cakes, cheesecakes and bakes by Chef Alex, made to order in Chennai.",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2c4032",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={`${fraunces.variable} ${grotesk.variable} antialiased`}>
-        <Aside />
-        <main className="lg:ml-[30vw]">
-          {children}
-          <Footer />
-        </main>
-        <a
-          href={waLink("Hi Baker's Perk!")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-3.5 left-3.5 right-3.5 z-50 flex items-center justify-center gap-2 rounded-full bg-wa py-4 text-sm font-medium text-white shadow-xl lg:hidden"
-        >
-          Order on WhatsApp
-        </a>
+        {children}
+        <Analytics />
+        <RegisterSW />
       </body>
     </html>
   );

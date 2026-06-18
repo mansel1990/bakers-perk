@@ -15,5 +15,5 @@ export const SITE = {
   minLeadDays: 2,
 };
 
-export const waLink = (text: string) =>
-  `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(text)}`;
+export const waLink = (text: string, number: string = SITE.whatsapp) =>
+  `https://wa.me/${number}?text=${encodeURIComponent(text)}`;

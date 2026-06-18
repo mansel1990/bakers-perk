@@ -20,20 +20,23 @@ A modern, colorful, elegant website for Bakers Perk, a Chennai-based cake maker.
 
 ## 2. Phases
 
-### Phase 1 (this build)
-- Marketing home page
-- Interactive menu page (standard items, weight variants, eggless)
-- Custom cakes showcase page (no priced builder yet — enquiry CTA to WhatsApp)
-- Cart → order saved to DB + pre-filled WhatsApp (wa.me) handoff
-- Gallery page (admin-managed)
-- Contact page (email form + fixed map of shop)
-- Admin backoffice: menu CRUD + pricing, orders dashboard, gallery management, shop settings
-- Google Analytics 4
-- SEO basics (metadata, OG images, sitemap, local-business schema)
+> **Plan updated 18 Jun 2026** — the build was re-cut into three phases. See `docs/PHASE2-PRD.md` for detail. Summary below.
 
-### Phase 2
-- Custom cake builder with live pricing (weight × flavor base rate + shape + eggless surcharge + priced add-ons + notes), all rates admin-configurable
-- Razorpay payments
+### Phase 1 — Static marketing site ✅ DONE
+- Marketing home, interactive menu (weight variants, eggless filter, search), custom-cakes showcase, gallery, contact + map
+- WhatsApp-first handoff throughout; "The Lookbook" design system
+- (No cart, DB, or admin — those moved to Phase 2)
+
+### Phase 2 — Database, admin & dynamic content (in progress)
+- ✅ Neon Postgres + Drizzle (`bakers_perk` schema); numeric pricing; all photos in Vercel Blob
+- ✅ Public site reads from DB; settings/banner DB-backed; GA4 (`G-20MNPYYJVH`)
+- ⬜ Auth.js login (username `alex`); admin backoffice (menu/cost CRUD, gallery, settings, contact inbox)
+- ⬜ SEO basics (sitemap, OG, LocalBusiness schema)
+
+### Phase 3 — Commerce & builder (later)
+- Cart → checkout → order saved to DB + WhatsApp summary; orders dashboard
+- **Razorpay payments**
+- Custom cake builder with live pricing (weight × flavor base rate + shape + eggless surcharge + priced add-ons), all admin-configurable
 - Delivery area restrictions (specific Chennai areas)
 - Possible: customer reference-image upload, promo banners/coupons
 
@@ -44,12 +47,12 @@ A modern, colorful, elegant website for Bakers Perk, a Chennai-based cake maker.
 | Layer | Choice |
 |---|---|
 | Framework | Next.js (App Router, TypeScript) |
-| Database | Vercel Postgres |
+| Database | Neon Postgres (Vercel-integrated) + Drizzle ORM, dedicated `bakers_perk` schema |
 | Images | Vercel Blob (admin uploads; no S3 needed) |
-| Admin auth | NextAuth credentials — primary admin can create 1–2 more admin logins |
-| Styling | Tailwind CSS + shadcn/ui, Framer Motion for subtle animation |
-| Email (contact form) | Resend (free tier) → shop email |
-| Analytics | GA4 (ID provided later) |
+| Admin auth | Auth.js (NextAuth v5) credentials — **login by username** (primary `alex`); can add more admins later |
+| Styling | Tailwind CSS v4 (shadcn/ui + Framer Motion not used — hand-rolled components) |
+| Email (contact form) | ~~Resend~~ — dropped; contact stored to DB inbox + WhatsApp |
+| Analytics | GA4 — `G-20MNPYYJVH` |
 | Maps | Google Maps embed (free iframe, no API key) |
 
 **Initial images:** the 20 downloaded photos go into the repo temporarily; a one-time seed script uploads them to Vercel Blob and registers them in the gallery table so admin can reorder/delete them from day one. No S3.
@@ -105,7 +108,7 @@ A modern, colorful, elegant website for Bakers Perk, a Chennai-based cake maker.
 - Fixed embedded map of shop location, address, hours, WhatsApp + Instagram links
 
 ### 4.7 Admin (`/admin`, auth-protected)
-- **Login:** email + password; primary admin can add/remove up to 2 more admins
+- **Login:** username + password (Auth.js); primary admin `alex` can add/remove more admins later
 - **Menu:** CRUD items, categories, weight variants + prices, egg/eggless, photos, hide/show, sort order
 - **Orders:** list + detail, statuses `new → confirmed → delivered / cancelled`, link to open customer's WhatsApp chat
 - **Gallery:** upload (Vercel Blob), reorder (drag), delete, pick homepage hero images
@@ -115,6 +118,8 @@ A modern, colorful, elegant website for Bakers Perk, a Chennai-based cake maker.
 ---
 
 ## 5. Data Model (Postgres)
+
+> **As-built schema lives in `docs/PHASE2-PRD.md` §3** (and `src/db/schema.ts`). The list below is the original conceptual model; the implemented version uses username-based admins, numeric `item_variants`, item `tags`, and category banner images.
 
 - `admins` (id, name, email, password_hash, created_by)
 - `categories` (id, name, slug, sort)
@@ -162,9 +167,10 @@ Modern editorial concept, approved via prototype (`lookbook.html`):
 | 4 | Tagline | ✅ "Bake this world a better place" (editable in admin settings) |
 | 5 | Logo files | ✅ Received (need transparent PNG/SVG for site use) |
 | 6 | Starting menu | ✅ 2020 PDF received — **confirm prices are still current** |
-| 7 | 20 images | Ready — add to repo at kickoff |
-| 8 | GA4 measurement ID | Later |
-| 9 | Exact delivery areas | Phase 2 |
+| 7 | 20 images | ✅ In repo + migrated to Vercel Blob |
+| 8 | GA4 measurement ID | ✅ G-20MNPYYJVH |
+| 9 | Exact delivery areas | Phase 3 |
+| 10 | Domain | ✅ bakersperk.com purchased (Spaceship) → Vercel |
 
 ---
 
