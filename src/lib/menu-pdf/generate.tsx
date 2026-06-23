@@ -11,8 +11,12 @@ async function embedCategoryImages(menu: MenuGroup[]): Promise<MenuGroup[]> {
   return Promise.all(
     menu.map(async (group) => {
       if (group.category.id === "cupcakes" || !group.category.image) return group;
-      const image = await blobUrlAsDataUri(group.category.image);
-      return { ...group, category: { ...group.category, image } };
+      try {
+        const image = await blobUrlAsDataUri(group.category.image);
+        return { ...group, category: { ...group.category, image } };
+      } catch {
+        return { ...group, category: { ...group.category, image: null } };
+      }
     })
   );
 }
