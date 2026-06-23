@@ -25,6 +25,7 @@ import { GALLERY } from "../data/gallery";
 import { SITE } from "../lib/site";
 
 const IMAGES_DIR = path.join(process.cwd(), "public", "images");
+const ASSETS_DIR = path.join(process.cwd(), "scripts", "assets");
 
 /** Hero photos flagged is_hero=true (mirrors HeroSlider's current selection). */
 const HERO_SRCS = new Set([
@@ -63,9 +64,12 @@ function parseVariants(price: string): { label: string; priceInr: number; isDefa
  */
 async function uploadImage(localSrc: string, folder: "menu" | "gallery" | "hero"): Promise<string | null> {
   const file = localSrc.replace("/images/", "");
-  const abs = path.join(IMAGES_DIR, file);
+  let abs = path.join(IMAGES_DIR, file);
   if (!fs.existsSync(abs)) {
-    console.warn(`  ! ${file} not found in public/images — skipping upload`);
+    abs = path.join(ASSETS_DIR, file);
+  }
+  if (!fs.existsSync(abs)) {
+    console.warn(`  ! ${file} not found in public/images or scripts/assets — skipping upload`);
     return null;
   }
   const data = fs.readFileSync(abs);
@@ -99,7 +103,7 @@ async function main() {
     const c = MENU_CATEGORIES[i];
     let imageUrl: string | null = null;
     const localBanner = CATEGORY_IMAGE[c.name];
-    if (localBanner && fs.existsSync(path.join(IMAGES_DIR, localBanner.replace("/images/", "")))) {
+    if (localBanner) {
       imageUrl = await uploadImage(localBanner, "menu");
     }
     const [row] = await db

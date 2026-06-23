@@ -18,6 +18,7 @@ import {
 } from "@/app/admin/actions";
 import BlobImageField from "@/components/admin/BlobImageField";
 import ConfirmButton from "@/components/admin/ConfirmButton";
+import { ActionFeedback, FormStatusProvider, SubmitButton } from "@/components/admin/FormSubmit";
 
 export const dynamic = "force-dynamic";
 
@@ -76,7 +77,7 @@ export default async function AdminMenuPage() {
               key={a.id}
               className="flex flex-wrap items-end gap-3 rounded-xl border border-line bg-cream/50 p-3"
             >
-              <form action={updateAddon} className="flex flex-1 flex-wrap items-end gap-3">
+              <FormStatusProvider action={updateAddon} className="flex flex-1 flex-wrap items-end gap-3">
                 <input type="hidden" name="id" value={a.id} />
                 <div className="min-w-[10rem] flex-1">
                   <Field label="Add-on">
@@ -91,8 +92,11 @@ export default async function AdminMenuPage() {
                 <label className="flex items-center gap-1.5 pb-2 text-xs text-muted">
                   <input type="checkbox" name="isActive" defaultChecked={a.isActive} className={CHK} /> Active
                 </label>
-                <button className={`${BTN} mb-0.5`}>Save</button>
-              </form>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <ActionFeedback />
+                  <SubmitButton className={BTN}>Save</SubmitButton>
+                </div>
+              </FormStatusProvider>
               <form action={deleteAddon} className="mb-0.5">
                 <input type="hidden" name="id" value={a.id} />
                 <ConfirmButton confirmText={`Delete add-on "${a.name}"?`} className={BTN_DANGER}>
@@ -114,7 +118,9 @@ export default async function AdminMenuPage() {
               <input name="priceInr" type="number" placeholder="0" className={INPUT} />
             </Field>
           </div>
-          <button className={BTN}>+ Add</button>
+          <SubmitButton className={BTN} pendingLabel="Adding…">
+            + Add
+          </SubmitButton>
         </form>
       </section>
 
@@ -140,7 +146,7 @@ export default async function AdminMenuPage() {
               <div className="space-y-5 border-t border-line bg-cream/40 p-4">
                 <div>
                   <SectionLabel>Category details</SectionLabel>
-                  <form action={updateCategory} className="mt-3 space-y-3">
+                  <FormStatusProvider action={updateCategory} className="mt-3 space-y-3">
                     <input type="hidden" name="id" value={c.id} />
                     <input type="hidden" name="imageUrl" defaultValue={c.imageUrl ?? ""} />
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -159,9 +165,12 @@ export default async function AdminMenuPage() {
                         <input type="checkbox" name="isVisible" defaultChecked={c.isVisible} className={CHK} />
                         Visible on the site
                       </label>
-                      <button className={BTN}>Save category</button>
+                      <div className="flex items-center gap-2">
+                        <ActionFeedback />
+                        <SubmitButton className={BTN}>Save category</SubmitButton>
+                      </div>
                     </div>
-                  </form>
+                  </FormStatusProvider>
                 </div>
 
                 <div className="border-t border-line pt-4">
@@ -199,7 +208,9 @@ export default async function AdminMenuPage() {
               <input name="sort" type="number" placeholder="0" className={INPUT} />
             </Field>
           </div>
-          <button className={BTN}>+ Add</button>
+          <SubmitButton className={BTN} pendingLabel="Adding…">
+            + Add
+          </SubmitButton>
         </form>
       </section>
 
@@ -238,7 +249,7 @@ export default async function AdminMenuPage() {
                   {/* Details */}
                   <div>
                     <SectionLabel>Details</SectionLabel>
-                    <form action={updateItem} className="mt-3 space-y-3">
+                    <FormStatusProvider action={updateItem} className="mt-3 space-y-3">
                       <input type="hidden" name="id" value={item.id} />
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Field label="Item name">
@@ -289,10 +300,11 @@ export default async function AdminMenuPage() {
                           <input name="sort" type="number" defaultValue={item.sort} className={INPUT} />
                         </Field>
                       </div>
-                      <div className="text-right">
-                        <button className={BTN}>Save details</button>
+                      <div className="flex items-center justify-end gap-2">
+                        <ActionFeedback />
+                        <SubmitButton className={BTN}>Save details</SubmitButton>
                       </div>
-                    </form>
+                    </FormStatusProvider>
                   </div>
 
                   {/* Photo */}
@@ -315,7 +327,7 @@ export default async function AdminMenuPage() {
                           key={v.id}
                           className="flex flex-wrap items-end gap-2.5 rounded-lg border border-line bg-paper p-2.5"
                         >
-                          <form action={updateVariant} className="flex flex-1 flex-wrap items-end gap-2.5">
+                          <FormStatusProvider action={updateVariant} className="flex flex-1 flex-wrap items-end gap-2.5">
                             <input type="hidden" name="id" value={v.id} />
                             <div className="w-32">
                               <Field label="Size label">
@@ -332,8 +344,11 @@ export default async function AdminMenuPage() {
                                 <input name="sort" type="number" defaultValue={v.sort} className={INPUT} />
                               </Field>
                             </div>
-                            <button className={`${BTN} mb-0.5`}>Save</button>
-                          </form>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <ActionFeedback />
+                              <SubmitButton className={BTN}>Save</SubmitButton>
+                            </div>
+                          </FormStatusProvider>
                           <div className="mb-0.5 flex items-center gap-2">
                             {v.isDefault ? (
                               <span className="rounded-full bg-accent/15 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[1px] text-accent">
@@ -343,7 +358,9 @@ export default async function AdminMenuPage() {
                               <form action={setDefaultVariant}>
                                 <input type="hidden" name="id" value={v.id} />
                                 <input type="hidden" name="itemId" value={item.id} />
-                                <button className={BTN_GHOST}>Make default</button>
+                                <SubmitButton className={BTN_GHOST} pendingLabel="Updating…">
+                                  Make default
+                                </SubmitButton>
                               </form>
                             )}
                             <form action={deleteVariant}>
@@ -373,7 +390,9 @@ export default async function AdminMenuPage() {
                           <input name="priceInr" type="number" placeholder="0" className={INPUT} />
                         </Field>
                       </div>
-                      <button className={BTN_GHOST}>+ Add price</button>
+                      <SubmitButton className={BTN_GHOST} pendingLabel="Adding…">
+                        + Add price
+                      </SubmitButton>
                     </form>
                   </div>
 
@@ -412,7 +431,9 @@ export default async function AdminMenuPage() {
             <label className="flex items-center gap-2 pb-2 text-xs text-muted">
               <input type="checkbox" name="isEggless" className={CHK} /> Eggless
             </label>
-            <button className={BTN}>+ Add item</button>
+            <SubmitButton className={BTN} pendingLabel="Adding…">
+              + Add item
+            </SubmitButton>
           </form>
         </section>
       ))}

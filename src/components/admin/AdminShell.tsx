@@ -10,6 +10,7 @@ const NAV = [
   { label: "Menu & pricing", href: "/admin/menu", icon: "✦" },
   { label: "Gallery", href: "/admin/gallery", icon: "❑" },
   { label: "Messages", href: "/admin/messages", icon: "✉" },
+  { label: "Bill generator", href: "/admin/bills", icon: "🧾" },
   { label: "Settings", href: "/admin/settings", icon: "⚙" },
 ];
 
@@ -34,19 +35,6 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           {l.label}
         </Link>
       ))}
-
-      {/* Bill generator — disabled placeholder (functionality TBD) */}
-      <span
-        aria-disabled
-        title="Coming soon"
-        className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm text-panel-muted/50"
-      >
-        <span>🧾</span>
-        Bill generator
-        <span className="ml-auto rounded-full border border-panel-line px-2 py-0.5 text-[9px] uppercase tracking-[1.5px]">
-          Soon
-        </span>
-      </span>
     </nav>
   );
 }

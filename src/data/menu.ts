@@ -76,6 +76,12 @@ export const FULL_MENU: MenuItem[] = [
   item("Triple Chocolate Mousse", "Tiramisu & Mousse", cakePrice(null, 1800), "chocolate mousse"),
   item("Hazelnut Praline", "Tiramisu & Mousse", cakePrice(900, 1800), "hazelnut praline mousse nuts"),
 
+  // Cupcakes
+  item("Choco Chip Red Velvet", "Cupcakes", INR(70), "choco chip red velvet cupcake"),
+  item("Caramel", "Cupcakes", INR(70), "caramel cupcake"),
+  item("Blueberry", "Cupcakes", INR(70), "blueberry cupcake"),
+  item("Chocolate", "Cupcakes", INR(70), "chocolate cupcake"),
+
   // Doughnuts
   item("Custard Doughnut", "Doughnuts", INR(120), "custard donut"),
   item("Cream Doughnut", "Doughnuts", INR(120), "cream donut"),
@@ -107,6 +113,7 @@ export const MENU_CATEGORIES: MenuCategory[] = [
   { name: "Premium Cakes", id: "premium-cakes", blurb: "A richer league — Belgian chocolate, Ferrero, pistachio and red velvet.", image: "/images/menu-premium.jpg" },
   { name: "Exotic Cakes", id: "exotic-cakes", blurb: "Baked cheesecakes and seasonal fruit specials, made to enquiry.", image: "/images/menu-exotic.jpg" },
   { name: "Tiramisu & Mousse", id: "tiramisu-mousse", blurb: "Spoonable indulgence — tiramisu tubs, mousse and praline dreams.", image: "/images/menu-tiramisu.jpg" },
+  { name: "Cupcakes", id: "cupcakes", blurb: "Frosted single-serve treats — choco chip red velvet, caramel, blueberry and chocolate.", image: "/images/menu-cupcakes.jpg" },
   { name: "Doughnuts", id: "doughnuts", blurb: "Soft, filled and glazed — the daily counter favourites.", image: "/images/menu-doughnuts.jpg" },
   { name: "Tarts & Pies", id: "tarts-pies", blurb: "Buttery shells with lemon, chocolate and spiced apple.", image: "/images/menu-tarts.jpg" },
 ];

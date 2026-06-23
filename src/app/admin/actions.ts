@@ -6,6 +6,7 @@ import { del } from "@vercel/blob";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
 import { sendAdminNotification } from "@/lib/push";
+import { allowedBlobUrlOrNull, assertAllowedBlobUrl } from "@/lib/blob-url";
 import { db } from "@/db";
 import {
   admins,
@@ -44,6 +45,21 @@ const int = (fd: FormData, k: string, d = 0) => {
 };
 const bool = (fd: FormData, k: string) => fd.get(k) === "on" || fd.get(k) === "true";
 
+export type ActionState = { ok?: boolean; error?: string };
+
+async function runAction(fn: () => Promise<void>): Promise<ActionState> {
+  try {
+    await fn();
+    return { ok: true };
+  } catch (e) {
+    console.error("[admin action]", e);
+    if (e instanceof Error && e.message === "Unauthorized") {
+      return { error: "Session expired. Sign in again." };
+    }
+    return { error: "Couldn't save. Try again." };
+  }
+}
+
 /* ----------------------------- Categories ------------------------------ */
 
 export async function createCategory(fd: FormData) {
@@ -60,20 +76,22 @@ export async function createCategory(fd: FormData) {
   refresh();
 }
 
-export async function updateCategory(fd: FormData) {
-  await requireAdmin();
-  const id = int(fd, "id");
-  await db
-    .update(categories)
-    .set({
-      name: str(fd, "name"),
-      blurb: str(fd, "blurb") || null,
-      imageUrl: str(fd, "imageUrl") || null,
-      sort: int(fd, "sort"),
-      isVisible: bool(fd, "isVisible"),
-    })
-    .where(eq(categories.id, id));
-  refresh();
+export async function updateCategory(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return runAction(async () => {
+    await requireAdmin();
+    const id = int(fd, "id");
+    await db
+      .update(categories)
+      .set({
+        name: str(fd, "name"),
+        blurb: str(fd, "blurb") || null,
+        imageUrl: allowedBlobUrlOrNull(str(fd, "imageUrl")),
+        sort: int(fd, "sort"),
+        isVisible: bool(fd, "isVisible"),
+      })
+      .where(eq(categories.id, id));
+    refresh();
+  });
 }
 
 export async function deleteCategory(fd: FormData) {
@@ -84,7 +102,8 @@ export async function deleteCategory(fd: FormData) {
 
 export async function setCategoryImage(categoryId: number, imageUrl: string) {
   await requireAdmin();
-  await db.update(categories).set({ imageUrl }).where(eq(categories.id, categoryId));
+  const safeUrl = assertAllowedBlobUrl(imageUrl);
+  await db.update(categories).set({ imageUrl: safeUrl }).where(eq(categories.id, categoryId));
   refresh();
 }
 
@@ -109,25 +128,26 @@ export async function createItem(fd: FormData) {
   refresh();
 }
 
-export async function updateItem(fd: FormData) {
-  await requireAdmin();
-  const id = int(fd, "id");
-  await db
-    .update(menuItems)
-    .set({
-      name: str(fd, "name"),
-      categoryId: int(fd, "categoryId"),
-      description: str(fd, "description") || null,
-      tags: str(fd, "tags") || null,
-      imageUrl: str(fd, "imageUrl") || null,
-      isEggless: bool(fd, "isEggless"),
-      isPriceOnRequest: bool(fd, "isPriceOnRequest"),
-      isVisible: bool(fd, "isVisible"),
-      sort: int(fd, "sort"),
-      updatedAt: new Date(),
-    })
-    .where(eq(menuItems.id, id));
-  refresh();
+export async function updateItem(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return runAction(async () => {
+    await requireAdmin();
+    const id = int(fd, "id");
+    await db
+      .update(menuItems)
+      .set({
+        name: str(fd, "name"),
+        categoryId: int(fd, "categoryId"),
+        description: str(fd, "description") || null,
+        tags: str(fd, "tags") || null,
+        isEggless: bool(fd, "isEggless"),
+        isPriceOnRequest: bool(fd, "isPriceOnRequest"),
+        isVisible: bool(fd, "isVisible"),
+        sort: int(fd, "sort"),
+        updatedAt: new Date(),
+      })
+      .where(eq(menuItems.id, id));
+    refresh();
+  });
 }
 
 export async function deleteItem(fd: FormData) {
@@ -138,7 +158,11 @@ export async function deleteItem(fd: FormData) {
 
 export async function setItemImage(itemId: number, imageUrl: string) {
   await requireAdmin();
-  await db.update(menuItems).set({ imageUrl, updatedAt: new Date() }).where(eq(menuItems.id, itemId));
+  const safeUrl = assertAllowedBlobUrl(imageUrl);
+  await db
+    .update(menuItems)
+    .set({ imageUrl: safeUrl, updatedAt: new Date() })
+    .where(eq(menuItems.id, itemId));
   refresh();
 }
 
@@ -160,13 +184,15 @@ export async function addVariant(fd: FormData) {
   refresh();
 }
 
-export async function updateVariant(fd: FormData) {
-  await requireAdmin();
-  await db
-    .update(itemVariants)
-    .set({ label: str(fd, "label"), priceInr: int(fd, "priceInr"), sort: int(fd, "sort") })
-    .where(eq(itemVariants.id, int(fd, "id")));
-  refresh();
+export async function updateVariant(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return runAction(async () => {
+    await requireAdmin();
+    await db
+      .update(itemVariants)
+      .set({ label: str(fd, "label"), priceInr: int(fd, "priceInr"), sort: int(fd, "sort") })
+      .where(eq(itemVariants.id, int(fd, "id")));
+    refresh();
+  });
 }
 
 export async function setDefaultVariant(fd: FormData) {
@@ -201,13 +227,15 @@ export async function createAddon(fd: FormData) {
   refresh();
 }
 
-export async function updateAddon(fd: FormData) {
-  await requireAdmin();
-  await db
-    .update(itemAddons)
-    .set({ name: str(fd, "name"), priceInr: int(fd, "priceInr"), isActive: bool(fd, "isActive") })
-    .where(eq(itemAddons.id, int(fd, "id")));
-  refresh();
+export async function updateAddon(_prev: ActionState, fd: FormData): Promise<ActionState> {
+  return runAction(async () => {
+    await requireAdmin();
+    await db
+      .update(itemAddons)
+      .set({ name: str(fd, "name"), priceInr: int(fd, "priceInr"), isActive: bool(fd, "isActive") })
+      .where(eq(itemAddons.id, int(fd, "id")));
+    refresh();
+  });
 }
 
 export async function deleteAddon(fd: FormData) {
