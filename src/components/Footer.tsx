@@ -39,6 +39,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
             ["Menu", "/menu"],
             ["Custom cakes", "/custom-cakes"],
             ["Gallery", "/gallery"],
+            ["Our story", "/our-story"],
             ["Contact", "/contact"],
           ].map(([label, href]) => (
             <Link key={href} href={href} className="block py-1 text-[13px] text-dark-muted hover:text-on-ink">

@@ -1,10 +1,16 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Baker's Perk — Handcrafted cakes in Chennai";
+export const alt = "Baker's Perk";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const iconPath = path.join(process.cwd(), "public/icon-512.png");
+  const icon = await readFile(iconPath);
+  const src = `data:image/png;base64,${icon.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -12,24 +18,13 @@ export default function OpengraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
-          padding: "80px",
           background: "#2c4032",
-          color: "#eef3e4",
-          fontFamily: "Georgia, serif",
         }}
       >
-        <div style={{ fontSize: 30, letterSpacing: 8, textTransform: "uppercase", color: "#c97a90" }}>
-          Chennai · Made to order
-        </div>
-        <div style={{ display: "flex", alignItems: "baseline", marginTop: 16 }}>
-          <div style={{ fontSize: 132, fontWeight: 700, lineHeight: 1 }}>Baker&apos;s Perk</div>
-          <div style={{ fontSize: 132, fontWeight: 700, color: "#c97a90" }}>.</div>
-        </div>
-        <div style={{ fontSize: 40, marginTop: 28, color: "#9fb298", maxWidth: 900 }}>
-          Handcrafted cakes, cheesecakes &amp; bakes by Chef Alex.
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} width={360} height={360} alt="" />
       </div>
     ),
     { ...size }

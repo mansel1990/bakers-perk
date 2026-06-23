@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/menu/pdf": ["./src/assets/brand/**/*", "./scripts/assets/pdf/**/*"],
     "/api/admin/bill/pdf": ["./src/assets/brand/**/*"],
+    "/opengraph-image": ["./public/icon-512.png"],
+    "/twitter-image": ["./public/icon-512.png"],
   },
   images: {
     remotePatterns: [

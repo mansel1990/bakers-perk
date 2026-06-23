@@ -3,6 +3,7 @@ import { Fraunces, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Analytics from "@/components/Analytics";
 import RegisterSW from "@/components/RegisterSW";
+import { SHARE_IMAGE, SITE_URL } from "@/lib/share-metadata";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -16,7 +17,7 @@ const grotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://bakersperk.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Baker's Perk — Handcrafted cakes in Chennai",
     template: "%s · Baker's Perk",
@@ -33,19 +34,25 @@ export const metadata: Metadata = {
     "photo cakes",
     "birthday cakes Chennai",
   ],
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     siteName: "Baker's Perk",
     title: "Baker's Perk — Handcrafted cakes in Chennai",
     description:
       "Handcrafted cakes, cheesecakes and bakes by Chef Alex. Made to order, delivered anywhere in Chennai.",
-    url: "https://bakersperk.com",
+    url: SITE_URL,
     locale: "en_IN",
+    images: [SHARE_IMAGE],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Baker's Perk — Handcrafted cakes in Chennai",
     description: "Handcrafted cakes, cheesecakes and bakes by Chef Alex, made to order in Chennai.",
+    images: [SHARE_IMAGE.url],
   },
 };
 

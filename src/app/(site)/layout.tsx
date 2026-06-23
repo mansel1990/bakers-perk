@@ -2,6 +2,7 @@ import Aside from "@/components/Aside";
 import Footer from "@/components/Footer";
 import { waLink } from "@/lib/site";
 import { getSettings } from "@/lib/data";
+import { SHARE_IMAGE, SITE_URL } from "@/lib/share-metadata";
 
 export default async function SiteLayout({
   children,
@@ -13,10 +14,10 @@ export default async function SiteLayout({
     "@type": "Bakery",
     name: settings.name,
     description: settings.tagline,
-    url: "https://bakersperk.com",
+    url: SITE_URL,
     telephone: `+${settings.whatsapp}`,
     email: settings.email,
-    image: "https://bakersperk.com/opengraph-image",
+    image: `${SITE_URL}${SHARE_IMAGE.url}`,
     priceRange: "₹₹",
     servesCuisine: "Cakes & Bakes",
     address: {

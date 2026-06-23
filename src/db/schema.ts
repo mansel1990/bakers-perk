@@ -170,6 +170,30 @@ export const contactMessages = schema.table("contact_messages", {
 });
 
 /* ----------------------------------------------------------------------------
+ * Invoices (admin bill generator — saved for history & re-download)
+ * --------------------------------------------------------------------------*/
+export const invoices = schema.table(
+  "invoices",
+  {
+    id: serial("id").primaryKey(),
+    invoiceNumber: varchar("invoice_number", { length: 32 }).notNull(),
+    invoiceDate: date("invoice_date").notNull(),
+    customer: jsonb("customer").notNull(),
+    lineItems: jsonb("line_items").notNull(),
+    discountInr: integer("discount_inr").notNull().default(0),
+    bank: jsonb("bank").notNull(),
+    subtotalInr: integer("subtotal_inr").notNull(),
+    totalInr: integer("total_inr").notNull(),
+    adminId: integer("admin_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("invoices_number_uq").on(t.invoiceNumber),
+    index("invoices_created_idx").on(t.createdAt),
+  ]
+);
+
+/* ----------------------------------------------------------------------------
  * Settings (key/value — tagline, whatsapp_number, hours, banner, etc.)
  * --------------------------------------------------------------------------*/
 export const settings = schema.table("settings", {
@@ -204,5 +228,6 @@ export type GalleryImage = typeof galleryImages.$inferSelect;
 export type Order = typeof orders.$inferSelect;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type ContactMessage = typeof contactMessages.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;
 export type Setting = typeof settings.$inferSelect;
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;

@@ -1,13 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { computeLineAmount } from "@/lib/bill/calc";
 import { DEFAULT_BILL_BANK, EMPTY_LINE_ITEM } from "@/lib/bill/defaults";
 import { billRs } from "@/lib/bill/format";
 import type { BillLineItem, BillPayload } from "@/lib/bill/types";
 import { billSubtotal, billTotal } from "@/lib/bill/types";
+import InvoiceHistory, { type InvoiceSummary } from "./InvoiceHistory";
 
 const INPUT =
   "mt-1.5 w-full rounded-xl border border-line bg-cream px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent";
+
+const INPUT_READONLY =
+  "mt-1.5 w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink outline-none";
 
 function todayIso(): string {
   const d = new Date();
@@ -24,13 +29,15 @@ function Field({
   type = "text",
   placeholder,
   className,
+  readOnly,
 }: {
   label: string;
   value: string | number;
-  onChange: (v: string) => void;
+  onChange?: (v: string) => void;
   type?: string;
   placeholder?: string;
   className?: string;
+  readOnly?: boolean;
 }) {
   return (
     <label className={className ?? "block"}>
@@ -38,12 +45,20 @@ function Field({
       <input
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         placeholder={placeholder}
-        className={INPUT}
+        readOnly={readOnly}
+        className={readOnly ? INPUT_READONLY : INPUT}
       />
     </label>
   );
+}
+
+async function fetchNextInvoiceNumber(): Promise<string> {
+  const res = await fetch("/api/admin/bill/next-number");
+  if (!res.ok) throw new Error("Could not fetch invoice number.");
+  const data = (await res.json()) as { invoiceNumber: string };
+  return data.invoiceNumber;
 }
 
 export default function BillGeneratorForm() {
@@ -60,14 +75,63 @@ export default function BillGeneratorForm() {
   ]);
   const [bank, setBank] = useState({ ...DEFAULT_BILL_BANK });
   const [loading, setLoading] = useState(false);
+  const [loadingNumber, setLoadingNumber] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<InvoiceSummary[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [loadedInvoiceId, setLoadedInvoiceId] = useState<number | null>(null);
 
   const discountNum = Math.max(0, Number(discount) || 0);
   const subtotal = useMemo(() => billSubtotal(lineItems), [lineItems]);
   const total = useMemo(() => billTotal(lineItems, discountNum), [lineItems, discountNum]);
 
+  const refreshHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    try {
+      const res = await fetch("/api/admin/bill/history");
+      if (!res.ok) throw new Error("Failed to load history.");
+      const data = (await res.json()) as { invoices: InvoiceSummary[] };
+      setHistory(data.invoices);
+    } catch {
+      setHistory([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  const refreshNextNumber = useCallback(async () => {
+    setLoadingNumber(true);
+    try {
+      const num = await fetchNextInvoiceNumber();
+      setInvoiceNumber(num);
+    } catch {
+      setError("Could not load the next invoice number.");
+    } finally {
+      setLoadingNumber(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshNextNumber();
+    void refreshHistory();
+  }, [refreshNextNumber, refreshHistory]);
+
   function updateLine(index: number, patch: Partial<BillLineItem>) {
     setLineItems((rows) => rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  }
+
+  function updateLineWithCalc(index: number, patch: Partial<BillLineItem>) {
+    setLineItems((rows) =>
+      rows.map((row, i) => {
+        if (i !== index) return row;
+        const next = { ...row, ...patch };
+        if ("quantity" in patch || "rate" in patch) {
+          const computed = computeLineAmount(next.quantity, next.rate);
+          if (computed > 0) next.amount = computed;
+        }
+        return next;
+      })
+    );
   }
 
   function addLine() {
@@ -76,6 +140,51 @@ export default function BillGeneratorForm() {
 
   function removeLine(index: number) {
     setLineItems((rows) => (rows.length <= 1 ? rows : rows.filter((_, i) => i !== index)));
+  }
+
+  function loadBill(bill: BillPayload, invoiceId?: number) {
+    setLoadedInvoiceId(invoiceId ?? null);
+    setInvoiceNumber(bill.invoiceNumber);
+    setDate(bill.date || todayIso());
+    setCustomerName(bill.customer.name);
+    setCustomerAddress(bill.customer.address);
+    setCustomerCity(bill.customer.city);
+    setCustomerZip(bill.customer.zipCode);
+    setDiscount(String(bill.discount));
+    setLineItems(bill.lineItems.length > 0 ? bill.lineItems : [{ ...EMPTY_LINE_ITEM }]);
+    setBank({ ...bill.bank });
+    setError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function handleLoadFromHistory(id: number) {
+    try {
+      const res = await fetch(`/api/admin/bill/${id}`);
+      if (!res.ok) throw new Error("Could not load invoice.");
+      const data = (await res.json()) as { bill: BillPayload };
+      loadBill(data.bill, id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load invoice.");
+    }
+  }
+
+  async function handleDownloadFromHistory(id: number) {
+    try {
+      const res = await fetch(`/api/admin/bill/${id}/pdf`);
+      if (!res.ok) throw new Error("PDF download failed.");
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const match = disposition.match(/filename="([^"]+)"/);
+      const filename = match?.[1] ?? `bakers-perk-invoice.pdf`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not download PDF.");
+    }
   }
 
   function buildPayload(): BillPayload | null {
@@ -89,19 +198,19 @@ export default function BillGeneratorForm() {
       }))
       .filter((row) => row.description && row.amount > 0);
 
-    const num = invoiceNumber.trim();
-    if (!num) {
-      setError("Invoice number is required.");
-      return null;
-    }
     if (items.length === 0) {
       setError("Add at least one line item with a description and amount.");
       return null;
     }
 
+    if (!invoiceNumber.trim()) {
+      setError("Invoice number is not ready yet. Wait a moment and try again.");
+      return null;
+    }
+
     setError(null);
     return {
-      invoiceNumber: num,
+      invoiceNumber: invoiceNumber.trim(),
       date,
       customer: {
         name: customerName.trim(),
@@ -130,19 +239,28 @@ export default function BillGeneratorForm() {
       const res = await fetch("/api/admin/bill/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          ...payload,
+          ...(loadedInvoiceId != null ? { invoiceId: loadedInvoiceId } : {}),
+        }),
       });
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || "PDF generation failed");
       }
+
+      const savedNumber = res.headers.get("X-Invoice-Number") ?? payload.invoiceNumber;
+      const savedId = res.headers.get("X-Invoice-Id");
+      if (savedId) setLoadedInvoiceId(parseInt(savedId, 10));
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `bakers-perk-invoice-${payload.invoiceNumber}.pdf`;
+      a.download = `bakers-perk-invoice-${savedNumber}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+
+      await Promise.all([refreshHistory(), refreshNextNumber()]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not generate PDF.");
     } finally {
@@ -150,14 +268,44 @@ export default function BillGeneratorForm() {
     }
   }
 
+  function handleNewInvoice() {
+    setDate(todayIso());
+    setCustomerName("");
+    setCustomerAddress("");
+    setCustomerCity("");
+    setCustomerZip("");
+    setDiscount("0");
+    setLineItems([{ ...EMPTY_LINE_ITEM }, { ...EMPTY_LINE_ITEM }]);
+    setBank({ ...DEFAULT_BILL_BANK });
+    setError(null);
+    setLoadedInvoiceId(null);
+    void refreshNextNumber();
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-line bg-paper p-5 lg:p-6">
-        <div className="text-[10px] uppercase tracking-[3px] text-accent">Invoice</div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-[10px] uppercase tracking-[3px] text-accent">Invoice</div>
+          <button
+            type="button"
+            onClick={handleNewInvoice}
+            className="rounded-full border border-line px-4 py-1.5 text-[11px] uppercase tracking-[2px] text-ink transition-colors hover:border-accent"
+          >
+            New invoice
+          </button>
+        </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Invoice #" value={invoiceNumber} onChange={setInvoiceNumber} placeholder="2556" />
+          <Field
+            label="Invoice # (auto)"
+            value={loadingNumber ? "…" : invoiceNumber}
+            readOnly
+          />
           <Field label="Date" value={date} onChange={setDate} type="date" />
         </div>
+        <p className="mt-3 text-xs text-muted">
+          Invoice numbers are assigned automatically and saved to history when you download a PDF.
+        </p>
       </div>
 
       <div className="rounded-2xl border border-line bg-paper p-5 lg:p-6">
@@ -195,18 +343,18 @@ export default function BillGeneratorForm() {
               </div>
               <div className="sm:col-span-2">
                 <Field
-                  label="Quantity"
+                  label="Quantity (kg)"
                   value={row.quantity}
-                  onChange={(v) => updateLine(i, { quantity: v })}
-                  placeholder="9 Kg"
+                  onChange={(v) => updateLineWithCalc(i, { quantity: v })}
+                  placeholder="9"
                 />
               </div>
               <div className="sm:col-span-2">
                 <Field
-                  label="Rate"
+                  label="Rate per kg (₹)"
                   value={row.rate}
-                  onChange={(v) => updateLine(i, { rate: v })}
-                  placeholder="1200 or 25/Unit"
+                  onChange={(v) => updateLineWithCalc(i, { rate: v })}
+                  placeholder="1200"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -223,7 +371,7 @@ export default function BillGeneratorForm() {
                   type="button"
                   onClick={() => removeLine(i)}
                   disabled={lineItems.length <= 1}
-                  className="w-full rounded-full border border-line px-3 py-2.5 text-[11px] text-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-40"
+                  className="w-full rounded-full border border-accent/40 bg-accent/10 px-3 py-2.5 text-[11px] font-medium text-accent transition-colors hover:bg-accent hover:text-white disabled:opacity-40"
                 >
                   Remove
                 </button>
@@ -231,6 +379,10 @@ export default function BillGeneratorForm() {
             </div>
           ))}
         </div>
+
+        <p className="mt-3 text-xs text-muted">
+          Amount auto-calculates from quantity × rate per kg. You can override it manually if needed.
+        </p>
 
         <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t border-line pt-4">
           <Field
@@ -249,7 +401,7 @@ export default function BillGeneratorForm() {
 
       <div className="rounded-2xl border border-line bg-paper p-5 lg:p-6">
         <div className="text-[10px] uppercase tracking-[3px] text-accent">Account details</div>
-        <p className="mt-2 text-sm text-muted">Printed on the bill for bank transfer. Defaults match your sample invoice.</p>
+        <p className="mt-2 text-sm text-muted">Printed on the bill for bank transfer.</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Field
             label="Account holder"
@@ -281,7 +433,7 @@ export default function BillGeneratorForm() {
       <button
         type="button"
         onClick={handleGenerate}
-        disabled={loading}
+        disabled={loading || loadingNumber}
         className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-on-ink transition-transform hover:scale-[1.01] disabled:opacity-60"
       >
         <svg
@@ -300,6 +452,14 @@ export default function BillGeneratorForm() {
         </svg>
         {loading ? "Generating PDF…" : "Download bill PDF"}
       </button>
+
+      <InvoiceHistory
+        invoices={history}
+        loading={historyLoading}
+        onLoad={handleLoadFromHistory}
+        onDownload={handleDownloadFromHistory}
+        onRefresh={refreshHistory}
+      />
     </div>
   );
 }

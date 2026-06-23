@@ -89,7 +89,7 @@ export default async function ContactPage() {
               className="h-56 w-full lg:h-64"
             />
           </div>
-          <ContactForm whatsapp={SITE.whatsapp} />
+          <ContactForm />
         </div>
       </div>
     </div>
