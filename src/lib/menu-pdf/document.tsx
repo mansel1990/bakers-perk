@@ -1,6 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { AddonView, MenuGroup, MenuPricing, SiteSettings } from "@/lib/data";
-import { allowedBlobUrlOrNull } from "@/lib/blob-url";
 import type { PdfWatermarkSet } from "./watermarks";
 import { PDF_THEME as t } from "./theme";
 
@@ -436,9 +435,7 @@ export function MenuPdfDocument({ settings, menu, addons, watermarks, logo }: Me
               name={group.category.name}
               blurb={group.category.blurb}
               image={
-                group.category.id === "cupcakes"
-                  ? watermarks.cupcakeBanner
-                  : allowedBlobUrlOrNull(group.category.image)
+                group.category.id === "cupcakes" ? watermarks.cupcakeBanner : group.category.image
               }
             />
             {group.items.map((item) => (

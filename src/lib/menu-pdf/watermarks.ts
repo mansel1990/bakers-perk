@@ -1,10 +1,10 @@
 import "server-only";
-import fs from "node:fs";
 import path from "node:path";
+import { fetchImageAsDataUri, readLocalImageAsDataUri } from "./images";
 
 const ASSETS_DIR = path.join(process.cwd(), "scripts", "assets", "pdf");
 
-/** Pexels — free to use. Cached locally after first fetch. */
+/** Pexels — free to use. Fetched in memory on serverless; local cache optional in dev. */
 const WATERMARK_SOURCES = [
   {
     file: "watermark-chocolate-cake.jpg",
@@ -33,29 +33,15 @@ export type PdfWatermarkSet = {
   cupcakeBanner: string;
 };
 
-function toDataUri(filePath: string): string {
-  const buf = fs.readFileSync(filePath);
-  return `data:image/jpeg;base64,${buf.toString("base64")}`;
+async function resolveWatermark(file: string, url: string): Promise<string> {
+  const local = readLocalImageAsDataUri(path.join(ASSETS_DIR, file));
+  if (local) return local;
+  return fetchImageAsDataUri(url);
 }
 
-async function downloadIfMissing(file: string, url: string, force = false) {
-  fs.mkdirSync(ASSETS_DIR, { recursive: true });
-  const dest = path.join(ASSETS_DIR, file);
-  if (force && fs.existsSync(dest)) fs.unlinkSync(dest);
-  if (fs.existsSync(dest)) return;
-
-  const res = await fetch(url, {
-    headers: { "User-Agent": "BakersPerk/1.0 (menu PDF; +https://bakersperk.com)" },
-  });
-  if (!res.ok) throw new Error(`Failed to download PDF watermark ${file}: ${res.status}`);
-  fs.writeFileSync(dest, Buffer.from(await res.arrayBuffer()));
-}
-
-/** Ensures local watermark assets exist. */
+/** Load watermark assets as data URIs (works on read-only serverless filesystems). */
 export async function getPdfWatermarks(): Promise<PdfWatermarkSet> {
-  const refresh = process.env.PDF_REFRESH_WATERMARKS === "1";
-  await Promise.all(WATERMARK_SOURCES.map((s) => downloadIfMissing(s.file, s.url, refresh)));
-  const uris = WATERMARK_SOURCES.map((s) => toDataUri(path.join(ASSETS_DIR, s.file)));
+  const uris = await Promise.all(WATERMARK_SOURCES.map((s) => resolveWatermark(s.file, s.url)));
   return {
     accents: uris,
     pageFill: uris[0],
