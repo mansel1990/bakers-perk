@@ -18,8 +18,8 @@ export default async function Home() {
       {/* Hero — crossfading slider of the most striking cakes */}
       <section className="relative h-[58svh] overflow-hidden bg-ink-2 lg:h-[84svh]">
         <HeroSlider photos={heroPhotos} />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-ink/10" />
-        <div className="absolute bottom-6 left-5 right-5 lg:bottom-9 lg:left-10 [text-shadow:0_1px_18px_rgba(20,28,22,0.45)]">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-ink/10" />
+        <div className="pointer-events-none absolute bottom-6 left-5 right-5 lg:bottom-9 lg:left-10 [text-shadow:0_1px_18px_rgba(20,28,22,0.45)]">
           <div className="text-[10px] uppercase tracking-[3px] text-accent">
             The 2026 collection
           </div>
